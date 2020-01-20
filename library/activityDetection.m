@@ -1,3 +1,4 @@
+function activityDetection (plotHandle, fileNames)
 % This is the main MATLAB script that needs to be run to execute the demo.
 % This script will load already saved training data to train the machine
 % learning algorithm. It then loads the new acceleration data, extracts
@@ -24,19 +25,22 @@ uniformSampleRate = 60; % Hz.
 %%
 %Step 1: Extract features from observation data (If features are extracted 
 % and saved in a file, just load the file.)
-fileWalk = 'acc_damian_spacer.txt'; % Change the file name to point to your file
+fileWalk =  fileNames{2}; %% 'acc_damian_spacer.txt'; % Change the file name to point to your file
+% fileWalk = 'acc_damian_spacer.txt'; % Change the file name to point to your file
 featureWalk = extractTrainingFeature(fileWalk,windowLength,uniformSampleRate);
 %%
 % fileRun = 'acc_damian_spacer.txt'; % Change the file name to point to your file
 % featureRun = extractTrainingFeature(fileRun,windowLength,uniformSampleRate);
 % 
-fileIdle = 'acc_damian_stanie1.txt'; % Change the file name to point to your file
+fileIdle =  fileNames{3}; %%'acc_damian_stanie1.txt'; % Change the file name to point to your file
+% fileIdle = 'acc_damian_stanie1.txt'; % Change the file name to point to your file
 featureIdle = extractTrainingFeature(fileIdle,windowLength,uniformSampleRate);
 % 
 % fileUp = 'upstairs1.mat'; % Change the file name to point to your file
 % featureUp = extractTrainingFeature(fileUp,windowLength,uniformSampleRate);
 % 
-fileDown = 'acc_damian_siedzenie.txt'; % Change the file name to point to your file
+fileDown = fileNames{1}; %%'acc_damian_siedzenie.txt'; % Change the file name to point to your file
+% fileDown = 'acc_damian_siedzenie.txt'; % Change the file name to point to your file
 featureDown = extractTrainingFeature(fileDown,windowLength,uniformSampleRate);
 % Load the extracted features from the training data above. Commnent the
 % line below if you are extracting 
@@ -70,11 +74,14 @@ knnK = 30; %num of nearest neighbors using in KNN classifier
 mdl.NumNeighbors = knnK;%specify num of nearest neighbors
 %%
 %Step 4: load recorded data and uniformly resample it
-newMatrix1 = load('acc_damian_spacer.txt');
-newMatrix2 = load('acc_damian_stanie1.txt');
-newMatrix3 = load('acc_damian_siedzenie.txt');
-newMatrix4 = load('acc_damian_stanie2.txt');
-
+% newMatrix1 = load('acc_damian_spacer.txt');
+% newMatrix2 = load('acc_damian_stanie1.txt');
+% newMatrix3 = load('acc_damian_siedzenie.txt');
+% newMatrix4 = load('acc_damian_stanie2.txt');
+newMatrix1 = load(fileNames{2});
+newMatrix2 = load(fileNames{3});
+newMatrix3 = load(fileNames{1});
+newMatrix4 = load(fileNames{4});
 newMatrix = [newMatrix1; newMatrix2; newMatrix3; newMatrix4];
 t = newMatrix(:,1)/1000; 
 a = newMatrix(:,2:end);
@@ -131,7 +138,8 @@ while (i < lastFrame)
 end
 %%
 %Step 6: Generate a plot of raw data and the results
-figure;
+axes(plotHandle)
+
 plot(t,a);
 % Raw acceleration data is bounded by +-20, leaving space in bottom of the 
 % graph for activity detection markers.
@@ -152,8 +160,12 @@ hDown = plot(t(frameIndex(resDown))+windowLength, 0*result(resDown)-25, 'cv');
 hTransition = plot(t(frameIndex(resUnknown))+windowLength, 0*result(resUnknown)-25, 'k.');
 % Increase y-axis limit to include the detected marker
 ylim([-30 20]);
-title('Raw acceleration data and detection result');
+
+ylabel('Amplituda');
+xlabel('Czas [s]');
+title('Pomiar wszystkich aktywnoœci akcelometrem i wynik detekcji');
 % Add legend to the graph
 legend([hWalk, hIdle, hDown, hTransition], ...
     'Walking','Idling','Sitting',...
     'Transition'); 
+end

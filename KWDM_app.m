@@ -79,16 +79,11 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 [file,path] = uigetfile('*.txt');
-path_with_file = fullfile(path,file);
-plik = load(path_with_file);
 
-czas = plik(:,2);
-xvalue = plik(:,3);
-yvalue = plik(:,4);
-zvalue = plik(:,5);
-axes(handles.axes1)
-plot(czas/1000, [xvalue, yvalue, zvalue]);
-ylabel('Amplituda');
-xlabel('Czas [s]');
-legend('oœ x','oœ y','oœ z');
-title('Pomiar wszystkich aktywnoœci akcelometrem');
+myFolders = regexp(file, '_', 'split');
+s = strcat('*.*',myFolders{2},'*.*');
+filePattern = fullfile(path, s);
+fileList = dir(filePattern);
+fileNames = {fileList.name};
+cla(handles.axes1);
+activityDetection(handles.axes1, fileNames)
